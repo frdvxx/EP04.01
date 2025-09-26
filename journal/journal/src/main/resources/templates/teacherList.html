@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Список преподавателей</title>
+</head>
+<body>
+<h1>Список преподавателей</h1>
+
+<!-- Форма добавления преподавателя -->
+<form action="/teachers/add" method="post">
+    <input type="text" name="firstName" placeholder="Имя" required>
+    <input type="text" name="lastName" placeholder="Фамилия" required>
+    <input type="text" name="subject" placeholder="Предмет" required>
+    <button type="submit">Добавить преподавателя</button>
+</form>
+
+<!-- Форма фильтров -->
+<h2>Фильтрация преподавателей:</h2>
+<form action="/teachers/search" method="get">
+    <input type="text" name="firstName" placeholder="Имя">
+    <input type="text" name="lastName" placeholder="Фамилия">
+    <input type="text" name="subject" placeholder="Предмет">
+    <button type="submit">Поиск</button>
+    <a href="/teachers"><button type="button">Сбросить фильтры</button></a>
+</form>
+
+<h2>Преподаватели (страница <span th:text="${currentPage}">1</span>):</h2>
+
+<ul>
+    <th:block th:each="teacher : ${teachers}">
+        <li>
+            <input type="checkbox" form="deleteMultipleForm" name="ids" th:value="${teacher.id}"/>
+            <span th:text="${teacher.firstName} + ' ' + ${teacher.lastName} + ' - ' + ${teacher.subject}"></span>
+
+            <form action="/teachers/update" method="post" style="display:inline;">
+                <input type="hidden" name="id" th:value="${teacher.id}"/>
+                <input type="text" name="firstName" placeholder="Имя" required/>
+                <input type="text" name="lastName" placeholder="Фамилия" required/>
+                <input type="text" name="subject" placeholder="Предмет" required/>
+                <button type="submit">Обновить</button>
+            </form>
+
+            <form action="/teachers/delete" method="post" style="display:inline;">
+                <input type="hidden" name="id" th:value="${teacher.id}"/>
+                <button type="submit">Удалить</button>
+            </form>
+
+            <form action="/teachers/softDelete" method="post" style="display:inline;">
+                <input type="hidden" name="id" th:value="${teacher.id}"/>
+                <button type="submit">Логически удалить</button>
+            </form>
+        </li>
+    </th:block>
+</ul>
+
+<form id="deleteMultipleForm" action="/teachers/deleteMultiple" method="post">
+    <button type="submit">Удалить выбранных</button>
+</form>
+
+<div>
+    <th:block th:if="${totalPages > 1}">
+        <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+            <a th:href="@{/teachers(page=${i}, pageSize=10)}"
+               th:text="${i}"
+               th:classappend="${i == currentPage} ? 'active' : ''"></a>
+        </span>
+    </th:block>
+</div>
+
+</body>
+</html>

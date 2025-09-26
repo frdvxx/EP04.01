@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Список курсов</title>
+</head>
+<body>
+<h1>Список курсов</h1>
+
+<!-- Форма добавления курса -->
+<form action="/courses/add" method="post">
+    <input type="text" name="name" placeholder="Название курса" required>
+    <input type="text" name="description" placeholder="Описание" required>
+    <button type="submit">Добавить курс</button>
+</form>
+
+<!-- Форма фильтров -->
+<h2>Фильтрация курсов:</h2>
+<form action="/courses/search" method="get">
+    <input type="text" name="name" placeholder="Название">
+    <input type="text" name="description" placeholder="Описание">
+    <button type="submit">Поиск</button>
+    <a href="/courses"><button type="button">Сбросить фильтры</button></a>
+</form>
+
+<h2>Курсы (страница <span th:text="${currentPage}">1</span>):</h2>
+
+<ul>
+    <th:block th:each="course : ${courses}">
+        <li>
+            <input type="checkbox" form="deleteMultipleForm" name="ids" th:value="${course.id}"/>
+            <span th:text="${course.name} + ' - ' + ${course.description}"></span>
+
+            <form action="/courses/update" method="post" style="display:inline;">
+                <input type="hidden" name="id" th:value="${course.id}"/>
+                <input type="text" name="name" placeholder="Название" required/>
+                <input type="text" name="description" placeholder="Описание" required/>
+                <button type="submit">Обновить</button>
+            </form>
+
+            <form action="/courses/delete" method="post" style="display:inline;">
+                <input type="hidden" name="id" th:value="${course.id}"/>
+                <button type="submit">Удалить</button>
+            </form>
+
+            <form action="/courses/softDelete" method="post" style="display:inline;">
+                <input type="hidden" name="id" th:value="${course.id}"/>
+                <button type="submit">Логически удалить</button>
+            </form>
+        </li>
+    </th:block>
+</ul>
+
+<form id="deleteMultipleForm" action="/courses/deleteMultiple" method="post">
+    <button type="submit">Удалить выбранные</button>
+</form>
+
+<div>
+    <th:block th:if="${totalPages > 1}">
+        <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+            <a th:href="@{/courses(page=${i}, pageSize=10)}"
+               th:text="${i}"
+               th:classappend="${i == currentPage} ? 'active' : ''"></a>
+        </span>
+    </th:block>
+</div>
+
+</body>
+</html>
